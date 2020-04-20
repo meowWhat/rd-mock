@@ -1,0 +1,26 @@
+{
+  "name": "rd-mock",
+  "version": "1.0.1",
+  "description": "帮助你开启服务器,通过配置实现自动化接口, 解决前后端开发 模拟数据的问题！！",
+  "main": "index.js",
+  "author": "cjh",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-body": "^4.1.1",
+    "koa-router": "^8.0.8",
+    "mockjs": "^1.1.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^4.1.1",
+    "@types/koa": "^2.11.3",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-router": "^7.4.0",
+    "@types/mockjs": "^1.0.2",
+    "rollup": "^2.6.1"
+  },
+  "scripts": {
+    "build": "rollup -c"
+  }
+}
