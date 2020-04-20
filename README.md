@@ -21,9 +21,11 @@ yarn  add rd-mock --dev # 或者：npm install rd-mock --dev
 
 ### 🔨 Usage example 使用示例
 
+- 利用 node 来执行下面文件尝试一下吧！
+
 ```javascript
 //引入rdmock | get rdmock
-const { rdMock } = require('./index')
+const { rdMock } = require('rd-mock')
 
 //构建mock数据  | create mock data
 const mock = [
@@ -118,7 +120,7 @@ rdMock(mock, 3000)
 ### Demo
 
 ```javascript
-const { rdMock } = require('./index')
+const { rdMock } = require('rd-mock')
 
 //如果你需要传递参数
 const mock = [

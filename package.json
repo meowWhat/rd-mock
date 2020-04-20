@@ -6,6 +6,16 @@
   "author": "cjh",
   "license": "MIT",
   "private": false,
+  "keywords": [
+    "mock",
+    "node",
+    "前端自动化工具",
+    "自动化模拟接口"
+  ],
+  "repository": {
+    "url": "https://github.com/meowWhat/rd-mock"
+  },
+  "homepage": "http://www.jiahao.site/",
   "dependencies": {
     "koa": "^2.11.0",
     "koa-body-parser": "^1.1.2",
