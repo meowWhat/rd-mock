@@ -1,6 +1,6 @@
 {
   "name": "rd-mock",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "帮助你开启服务器,通过配置实现自动化接口, 解决前后端开发 模拟数据的问题！！",
   "main": "index.js",
   "author": "cjh",
