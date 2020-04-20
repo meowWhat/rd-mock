@@ -1,23 +1,28 @@
 import * as Koa from 'koa'
-import * as koaBody from 'koa-body'
-import * as path from 'path'
+import * as koaBody from 'koa-body-parser'
 
 import { getRoutes } from './complier'
 import { Random } from 'mockjs'
 
 const app = new Koa()
 
-app.use(
-  koaBody({
-    multipart: true, // 支持文件上传
-    encoding: 'gzip',
-    formidable: {
-      uploadDir: path.join(__dirname, 'public/upload/'), // 设置文件上传目录
-      keepExtensions: true, // 保持文件的后缀
-      maxFieldsSize: 2 * 1024 * 1024, // 文件上传大小
-    },
+app.use(koaBody())
+
+app.use((ctx, next) => {
+  //设置跨域
+  if (ctx.method === 'OPTIONS') {
+    ctx.status = 200
+  }
+  ctx.set({
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'X-Token,Content-Type',
+    'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,PATCH',
+    'Access-Control-Allow-Credentials': 'true',
   })
-)
+
+  next()
+})
+
 const rdMock = (mock, port = 5111) => {
   app.use(getRoutes(mock))
   app.listen(port, () => {

@@ -1,6 +1,6 @@
 {
   "name": "rd-mock",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "帮助你开启服务器,通过配置实现自动化接口, 解决前后端开发 模拟数据的问题！！",
   "main": "index.js",
   "author": "cjh",
@@ -8,7 +8,7 @@
   "private": false,
   "dependencies": {
     "koa": "^2.11.0",
-    "koa-body": "^4.1.1",
+    "koa-body-parser": "^1.1.2",
     "koa-router": "^8.0.8",
     "mockjs": "^1.1.0"
   },
@@ -25,6 +25,7 @@
     "rollup-plugin-uglify": "^6.0.4"
   },
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "start": "node test.js"
   }
 }

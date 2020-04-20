@@ -1,6 +1,8 @@
 # rd-mock
 
+> Help you to open the server, through the configuration of automation interface, before and after the end of the development of analog data!
 > 帮助你开启服务器,通过配置实现自动化接口, 解决前后端开发 模拟数据的问题！！
+> 🔗 [GitHub](https://github.com/meowWhat/rd-mock) -- [Npm](https://www.npmjs.com/package/rd-mock)
 
 ## Getting Started 使用指南
 
@@ -12,18 +14,18 @@
 
 ```bash
 
-# 安装
+# 安装 install
 yarn  add rd-mock --dev # 或者：npm install rd-mock --dev
 
 ```
 
 ### 🔨 Usage example 使用示例
 
-```typescript
-//引入rdmock
+```javascript
+//引入rdmock | get rdmock
 const { rdMock } = require('./index')
 
-//构建mock数据
+//构建mock数据  | create mock data
 const mock = [
   {
     url: '/', //接口地址
@@ -45,13 +47,14 @@ const mock = [
     },
   },
 ]
-//开启监听
+//开启监听 | Listenning on port 3000
 rdMock(mock, 3000)
 
 //rdMock 会帮助你分析上面的 数组, 生成接口
+//then rdMock will help u create a Interface
 ```
 
-## 结果展示(访问http://localhost:3000/)
+## Result example 结果展示(访问http://localhost:3000/)
 
 ```json
 {
@@ -108,6 +111,84 @@ rdMock(mock, 3000)
     }
   ]
 }
+```
+
+## More example 更多栗子
+
+### Demo
+
+```javascript
+const { rdMock } = require('./index')
+
+//如果你需要传递参数
+const mock = [
+  {
+    url: '/', //接口地址
+    method: 'post', //请求方式
+    param: (param, query) => {
+      //param 获取 请求体传参
+      //query 获取 url传参
+      //需要你返回一个值 来决定 请求的结果
+      if (query.name === 'bug') {
+        return {
+          code: 200,
+          message: '恭喜你找到了 bug ~~~~',
+        }
+      }
+      if (param.username === 'admin' && param.password === 'admin') {
+        return {
+          code: 200,
+          message: 'ok',
+        }
+      }
+      return {
+        code: 400,
+        message: '账号或密码错误',
+      }
+    },
+  },
+]
+//开启监听
+rdMock(mock, 3000)
+```
+
+### Result
+
+```javascript
+const url = 'http://localhost:3000/'
+const data = {
+  username: 'admin',
+  password: 'admin',
+}
+fetch(url, {
+  method: 'post',
+  body: JSON.stringify(data),
+  headers: {
+    'content-type': 'application/json',
+  },
+})
+  .then((res) => res.json())
+  .then((response) => console.log('Success:', response))
+//index.html:28 Success: {code: 200, message: "ok"}
+
+fetch(url + '?name=bug', {
+  method: 'post',
+})
+  .then((res) => res.json())
+  .then((response) => console.log('Success:', response))
+//    Success: {code: 200, message: "恭喜你找到了 bug ~~~~"}
+```
+
+## 关于 rd-mock
+
+- (param, query) => res 中 param 采用 koa-body-parser 解析
+- query 结果为 ctx.query
+- 内部采用 cors 解决跨域问题
+- 更多的 mock 数据类型,请参考 [Mockjs](http://mockjs.com/)
+- 你可以拿到必要的 Mockjs 中 Random 方法 如果你需要的话 就像这样,当然 rd-mock 依赖于 Mockjs 你也可以直接引入
+
+```javascript
+const { Random } = require('rd-mock')
 ```
 
 ## 👀 License 授权协议
