@@ -1,0 +1,26 @@
+{
+  "name": "rd-mock",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/mockjs": "^1.0.2",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-router": "^8.0.8",
+    "mockjs": "^1.1.0",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.11.3",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-router": "^7.4.0",
+    "@types/node": "^13.13.2",
+    "rollup-plugin-typescript2": "^0.27.0"
+  },
+  "scripts": {
+    "build": "rollup --config",
+    "test": "node ./test/test.js",
+    "go": "yarn build && yarn test"
+  }
+}
