@@ -4,10 +4,12 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@types/lowdb": "^1.0.9",
     "@types/mockjs": "^1.0.2",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^8.0.8",
+    "lowdb": "^1.0.0",
     "mockjs": "^1.1.0",
     "typescript": "^3.8.3"
   },

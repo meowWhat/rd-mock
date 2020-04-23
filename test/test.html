@@ -7,27 +7,37 @@
   </head>
   <body>
     <script>
-      const url = 'http://localhost:3000/'
-      const data = {
-        username: 'admin',
-        password: 'admin',
-      }
-      fetch(url, {
+      const url = 'http://localhost:3000/a'
+      fetch(`${url}`, {
+        //get all
         method: 'GET',
-
-        headers: {
-          'content-type': 'application/json',
-        },
       })
         .then((res) => res.json())
-        .then((response) => console.log('Successsss:', response))
-
-      fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(data),
+        .then((response) => console.log('get all:', response))
+      fetch(`${url}?money_gte=200&id_lte=12&_limit=3&_order=desc`, {
+        method: 'GET',
+      })
+        //限制
+        .then((res) => res.json())
+        .then((response) => console.log('限制', response))
+      fetch(`${url}?_page=2&_limit=5&_order=desc`, {
+        //分页查询
+        method: 'GET',
       })
         .then((res) => res.json())
-        .then((response) => console.log('Success:', response))
+        .then((response) => console.log('分页查询', response))
+      fetch(`${url}?money_gte=200&id_lte=12&_order=desc`, {
+        //筛选
+        method: 'GET',
+      })
+        .then((res) => res.json())
+        .then((response) => console.log('筛选  ', response))
+      fetch(`${url}?_sort=money&_page=1&_limit=2&money_gte=200&id_lte=12`, {
+        //分页查询 + 筛选
+        method: 'GET',
+      })
+        .then((res) => res.json())
+        .then((response) => console.log('分页查询 + 筛选:', response))
     </script>
   </body>
 </html>
