@@ -1,4 +1,4 @@
-const { rdMock } = require('../dist/index')
+const { rdMock } = require('../index')
 
 //use `mockjs` schema  to create rd-mock data
 //rd-mock require filed 'id' in schema
