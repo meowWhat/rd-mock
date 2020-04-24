@@ -7,6 +7,7 @@ export default {
     dir: './dist',
     format: 'cjs',
   },
+
   plugins: [
     typescript({
       tsconfig: 'tsconfig.json',
