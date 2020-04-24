@@ -1,8 +1,20 @@
 {
   "name": "rd-mock",
-  "version": "1.0.0",
+  "version": "1.2.7",
   "main": "index.js",
   "license": "MIT",
+  "description": "Get a full fake REST API And MockData with zero coding in less than 30 seconds,inspired by json-serve && mockjs",
+  "keywords": [
+    "mockjs",
+    "json-serve",
+    "Automation Api",
+    "Automation Mock",
+    "zero coding"
+  ],
+  "repository": {
+    "url": "https://github.com/meowWhat/rd-mock/"
+  },
+  "homepage": "https://github.com/meowWhat/rd-mock/",
   "dependencies": {
     "@types/lowdb": "^1.0.9",
     "@types/mockjs": "^1.0.2",
@@ -22,7 +34,7 @@
   },
   "scripts": {
     "build": "rollup --config",
-    "test": "node ./test/test.js",
-    "go": "yarn build && yarn test"
+    "start": "yarn build && yarn example",
+    "example": "node ./example/example.js"
   }
 }

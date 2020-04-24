@@ -15,7 +15,7 @@ app.use((ctx, next) => {
   }
   ctx.set({
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'X-Token,Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE',
     'Access-Control-Allow-Credentials': 'true',
   })

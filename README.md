@@ -1,198 +1,215 @@
 # rd-mock
 
-> Help you to open the server, through the configuration of automation interface, before and after the end of the development of analog data!
-> 帮助你开启服务器,通过配置实现自动化接口, 解决前后端开发 模拟数据的问题！！
+> Get a full fake REST API And MockData with zero coding in less than 30 seconds,inspired by json-serve && mockjs
+
 > 🔗 [GitHub](https://github.com/meowWhat/rd-mock) -- [Npm](https://www.npmjs.com/package/rd-mock)
 
-## Getting Started 使用指南
+## Getting Started
 
-### ⚠️ Prerequisites 项目使用条件
-
-请确保你的电脑安装过 Node.js 并且 Node.js 的版本大于 8.
-
-### 📦 Installation 安装
+### 📦 Install rd-mock
 
 ```bash
-
-# 安装 install
-yarn  add rd-mock --dev # 或者：npm install rd-mock --dev
-
+yarn add rd-mock --dev # or：npm install rd-mock --dev
 ```
 
-### 🔨 Usage example 使用示例
+### 🔨 Usage example
 
-- 利用 node 来执行下面文件尝试一下吧！
+- use rd-mock to start server
 
 ```javascript
-//引入rdmock | get rdmock
 const { rdMock } = require('rd-mock')
 
-//构建mock数据  | create mock data
-const mock = [
-  {
-    url: '/', //接口地址
-    method: 'get', //请求方式
-    res: {
-      //自定义res,类型参考mockjs
-      'array|5': [
-        {
-          'id|+1': 1,
-          name: '@cname',
-          address: `@city(true)`,
-          email: `@email`,
-          age: '@integer(12, 61)',
-          signUpTime: '@datetime',
-          prifile: '@cparagraph',
-          siteUrl: '@url',
-        },
-      ],
+//use `mockjs` schema  to create rd-mock data
+//rd-mock require filed 'id' in schema
+const schema = {
+  'a|5': [
+    {
+      'id|+1': 1,
+      'money|1-400': 1,
+      name: '@cname',
+      address: `@city(true)`,
+      email: `@email`,
     },
-  },
-]
-//开启监听 | Listenning on port 3000
-rdMock(mock, 3000)
+  ],
+}
 
-//rdMock 会帮助你分析上面的 数组, 生成接口
-//then rdMock will help u create a Interface
+// Start  rd-mock  on port 3000
+rdMock(schema, 3000)
 ```
 
-## Result example 结果展示(访问http://localhost:3000/)
+- use simple router
+
+```javascript
+const url = 'http://localhost:3000/a'
+fetch(`${url}`, {
+  //get data
+  method: 'GET',
+})
+  .then((res) => res.json())
+  .then((response) => {
+    console.log('all data', response)
+    return fetch(`${url}`, {
+      //create data
+      method: 'POST',
+      body: JSON.stringify({ id: 6, name: 'create data' }),
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    })
+  })
+  .then(() => {
+    return fetch(`${url}`, {
+      // update data
+      method: 'PUT',
+      body: JSON.stringify({ id: 5, name: 'update date' }),
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    })
+  })
+  .then(() => {
+    return fetch(`${url}`, {
+      // delete data
+      method: 'DELETE',
+      body: JSON.stringify({ id: 1 }),
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    })
+  })
+```
+
+- check the db.json
 
 ```json
 {
-  "array": [
+  "a": [
+    {
+      "id": 2,
+      "money": 316,
+      "name": "阎敏",
+      "address": "辽宁省 丹东市",
+      "email": "p.nieip@qxtw.wf"
+    },
+    {
+      "id": 3,
+      "money": 391,
+      "name": "史军",
+      "address": "青海省 海东市",
+      "email": "e.ubyqkg@sopfvyns.gf"
+    },
+    {
+      "id": 4,
+      "money": 326,
+      "name": "邱敏",
+      "address": "上海 上海市",
+      "email": "f.yfbbzpj@dijrig.st"
+    },
+    {
+      "id": 5,
+      "money": 81,
+      "name": "update date",
+      "address": "西藏自治区 山南地区",
+      "email": "v.zabx@mbpcrp.pa"
+    },
     {
       "id": 6,
-      "name": "熊明",
-      "address": "广东省 佛山市",
-      "email": "x.ekjh@epx.net.cn",
-      "age": 42,
-      "signUpTime": "1976-04-27 01:10:24",
-      "prifile": "干此领义以至论北养严南选器状离得。子参斗音果连西律音式得积东。据给斯转正资交压青改见少。",
-      "siteUrl": "tn3270://qkbxqv.dm/kjfp"
-    },
-    {
-      "id": 7,
-      "name": "姜磊",
-      "address": "安徽省 巢湖市",
-      "email": "c.aroxsjuo@cbobw.pg",
-      "age": 40,
-      "signUpTime": "1987-03-30 18:49:27",
-      "prifile": "上眼主称么共算圆资记候育化业它军术。始法元数农难酸观好现品入每易意使格江。认但证家层往地非活历传合。她装严为类改府果常观加场外件品美证。色厂指高你易集号件听就变下北今层上。完事种格作须不林别放王积。",
-      "siteUrl": "mid://gshymcg.ls/fbl"
-    },
-    {
-      "id": 8,
-      "name": "顾杰",
-      "address": "河南省 周口市",
-      "email": "d.pmrfs@kywvpy.mm",
-      "age": 52,
-      "signUpTime": "2012-05-14 05:31:30",
-      "prifile": "约系具品办商适头路六素育没确须结。生称易任家所美相准单深马管具者属传。料学空规五千劳住红自千水具地光声权。世难支示人自志二看联调置米因农动科。",
-      "siteUrl": "nntp://serdagkhb.br/nnipznsieu"
-    },
-    {
-      "id": 9,
-      "name": "卢杰",
-      "address": "海外 海外",
-      "email": "l.ndmyrmwd@eblhpda.sj",
-      "age": 33,
-      "signUpTime": "1973-01-01 12:09:05",
-      "prifile": "也基际严张光织学展从周色改。关严离果明志代更活设收论成处发段。子保应力层规着相那理律数。其二们至低之上除取声也度七。毛民五已是族东用半月己米每上增。应学约运原本九九据比越新。",
-      "siteUrl": "nntp://ypwdw.pr/igc"
-    },
-    {
-      "id": 10,
-      "name": "万强",
-      "address": "江西省 抚州市",
-      "email": "o.ifbyxme@eyptekg.hk",
-      "age": 17,
-      "signUpTime": "2006-11-18 06:31:57",
-      "prifile": "前验油江时果属东长是热指。线因走用响名江个间每研想内其由结总。代你全走识则走强务却生料引合出场其。法阶史资化接类类部电参持按。火管本放集需强义角前展会心做。林照得铁开济小把技元阶率争。个般书代主建分想风力头制正。",
-      "siteUrl": "http://jhg.fi/jwaul"
+      "name": "create data"
     }
   ]
 }
 ```
 
-## More example 更多栗子
+## Router Rule
 
-### Demo
+### Singular routes
 
-```javascript
-const { rdMock } = require('rd-mock')
-
-//如果你需要传递参数
-const mock = [
-  {
-    url: '/', //接口地址
-    method: 'post', //请求方式
-    param: (param, query) => {
-      //param 获取 请求体传参
-      //query 获取 url传参
-      //需要你返回一个值 来决定 请求的结果
-      if (query.name === 'bug') {
-        return {
-          code: 200,
-          message: '恭喜你找到了 bug ~~~~',
-        }
-      }
-      if (param.username === 'admin' && param.password === 'admin') {
-        return {
-          code: 200,
-          message: 'ok',
-        }
-      }
-      return {
-        code: 400,
-        message: '账号或密码错误',
-      }
-    },
-  },
-]
-//开启监听
-rdMock(mock, 3000)
+```
+GET    /profile
+POST   /profile
+PUT    /profile
+PATCH  /profile
 ```
 
-### Result
+### Filter
 
-```javascript
-const url = 'http://localhost:3000/'
-const data = {
-  username: 'admin',
-  password: 'admin',
-}
-fetch(url, {
-  method: 'post',
-  body: JSON.stringify(data),
-  headers: {
-    'content-type': 'application/json',
-  },
-})
-  .then((res) => res.json())
-  .then((response) => console.log('Success:', response))
-//index.html:28 Success: {code: 200, message: "ok"}
+- use '\_num' to parse string '20'
 
-fetch(url + '?name=bug', {
-  method: 'post',
-})
-  .then((res) => res.json())
-  .then((response) => console.log('Success:', response))
-//    Success: {code: 200, message: "恭喜你找到了 bug ~~~~"}
+```
+GET /posts?name=xxx&id=1
+GET /posts?number_num=20
 ```
 
-## 关于 rd-mock
+### Paginate
 
-- (param, query) => res 中 param 采用 koa-body-parser 解析
-- query 结果为 ctx.query
-- 内部采用 cors 解决跨域问题
-- 更多的 mock 数据类型,请参考 [Mockjs](http://mockjs.com/)
-- 你可以拿到必要的 Mockjs 中 Random 方法 如果你需要的话 就像这样,当然 rd-mock 依赖于 Mockjs 你也可以直接引入
+- Use \_page and \_limit to paginate data.
 
-```javascript
-const { Random } = require('rd-mock')
+```
+GET /posts?_page=2
+
+GET /posts?_page=3&_limit=5
 ```
 
-## 👀 License 授权协议
+- default \_page = 1 , default \_limit =10
+
+### Sort
+
+- Add \_sort and \_order
+
+```
+GET /posts?_sort=id&_order=asc
+GET /posts?_order=desc
+```
+
+- default \_sort = id ; default \_order=asc
+
+### Slice
+
+- Add \_start and \_end
+
+```
+GET /posts?_start=20&_end=30
+
+```
+
+- default \_start = -1 ; default \_end =-1
+- Works exactly as Array.slice
+
+### Operators
+
+- Add \_gte or \_lte for getting a range
+
+```
+GET /posts?views_gte=10
+GET /posts?views_gte=5&view_lte=20&id_lte=10
+```
+
+- Add \_ne to exclude a value
+
+```
+GET /posts?id_ne=1
+```
+
+- Add \_like to filter
+
+```
+GET /posts?title_like=xxx
+```
+
+- Works exactly as String.includes
+
+## Router Pipe
+
+```
+getAllbyReqUrl
+
+// if  Array.isArray(data) && data.length > 0
+
+=> queryConditon => Operators  => Slice => Paginate  => Sort
+
+// else  return data
+```
+
+## 👀 License
 
 这个项目 MIT 协议， 请点击 [LICENSE.md](LICENSE.md) 了解更多细节。

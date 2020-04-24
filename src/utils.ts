@@ -1,22 +1,16 @@
-export type query = { [key: string]: string | number }
+import { query } from './types'
 
-//筛选 gte lte 操作符
+//匹配操作符
 export const matchOperators = (query: query) => {
-  const regex1 = /\_gte/
-  const regex2 = /\_lte/
-  return Object.keys(query).filter(
-    (key) => regex1.test(key) || regex2.test(key)
+  //筛选 操作符
+  const regexArr = [/\_gte/, /\_lte/, /\_ne/, /\_like/, /\_num/]
+
+  return Object.keys(query).filter((key) =>
+    regexArr.some((regex) => regex.test(key))
   )
 }
 
-//getOperators 返回值类型
-type getOperatorsRes = {
-  [key: string]: {
-    operators: string
-    range: number
-  }[]
-}
-//解析匹配到的 gte lte 数组 返回一个对象
+//解析匹配到的  数组 返回一个对象
 export const getOperators = (arr: Array<string>, query: query) => {
   let temp: {
     [key: string]: Array<{ operators: string; range: number }>
@@ -37,30 +31,8 @@ export const getOperators = (arr: Array<string>, query: query) => {
   return temp
 }
 
-//根据 操作符对象 过滤 返回一个 Boolean
-export const filterDependOnOperators = (
-  condition: getOperatorsRes,
-  data: any
-) => {
-  return Object.keys(condition).every((key) => {
-    let objArr = condition[key]
-    return objArr.every((obj) => {
-      let temp = _parseInt(data[key])
-      if (obj.operators === 'gte') {
-        return temp > obj.range
-      }
-
-      if (obj.operators === 'lte') {
-        return temp < obj.range
-      }
-
-      return false
-    })
-  })
-}
-
 //转int类型
-export const _parseInt = (anything: string | number) => {
+export const _parseInt = (anything: string | number): number => {
   if (typeof anything === 'string') {
     anything = Number.parseInt(anything)
   }
@@ -68,7 +40,6 @@ export const _parseInt = (anything: string | number) => {
 }
 
 //统一接口
-
 export const getSendData = (
   result: {
     code: number
@@ -82,3 +53,28 @@ export const getSendData = (
     message: result.message,
   }
 }
+
+//过滤 并干掉内部字段
+export const filterQuery = (
+  query: query,
+  filed: '_start' | '_end' | '_limit' | '_sort' | '_order' | '_page' | '_num'
+) => {
+  let res = query[filed]
+
+  if (res !== undefined) {
+    delete query[filed]
+    return res
+  }
+
+  return null
+}
+
+//增强isArr
+export const isArr = (anything: any) =>
+  Array.isArray(anything) && anything.length > 0
+
+//增强isObj
+export const isObj = (anything: any) =>
+  typeof anything === 'object' &&
+  !isArr(anything) &&
+  isArr(Object.keys(anything))

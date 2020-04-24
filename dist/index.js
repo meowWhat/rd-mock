@@ -10,7 +10,12 @@ var Router = _interopDefault(require('koa-router'));
 var mockjs = require('mockjs');
 var low = _interopDefault(require('lowdb'));
 var FileSync = _interopDefault(require('lowdb/adapters/FileSync'));
+var fs = _interopDefault(require('fs'));
+var _ = _interopDefault(require('lodash'));
 
+if (fs.existsSync('db.json')) {
+    fs.unlinkSync('db.json');
+}
 var adapter = new FileSync('db.json');
 var db = low(adapter);
 
@@ -37,44 +42,12 @@ var DB = (function (schema) {
     };
 });
 
-//筛选 gte lte 操作符
+//匹配操作符
 var matchOperators = function (query) {
-    var regex1 = /\_gte/;
-    var regex2 = /\_lte/;
-    return Object.keys(query).filter(function (key) { return regex1.test(key) || regex2.test(key); });
-};
-//解析匹配到的 gte lte 数组 返回一个对象
-var getOperators = function (arr, query) {
-    var temp = {};
-    arr.forEach(function (key) {
-        var splits = key.split('_');
-        var name = splits[0];
-        var operators = splits[1];
-        if (!Array.isArray(temp[name])) {
-            temp[name] = [];
-        }
-        var range = _parseInt(query[key]);
-        temp[name].push({
-            range: range,
-            operators: operators,
-        });
-    });
-    return temp;
-};
-//根据 操作符对象 过滤 返回一个 Boolean
-var filterDependOnOperators = function (condition, data) {
-    return Object.keys(condition).every(function (key) {
-        var objArr = condition[key];
-        return objArr.every(function (obj) {
-            var temp = _parseInt(data[key]);
-            if (obj.operators === 'gte') {
-                return temp > obj.range;
-            }
-            if (obj.operators === 'lte') {
-                return temp < obj.range;
-            }
-            return false;
-        });
+    //筛选 操作符
+    var regexArr = [/\_gte/, /\_lte/, /\_ne/, /\_like/, /\_num/];
+    return Object.keys(query).filter(function (key) {
+        return regexArr.some(function (regex) { return regex.test(key); });
     });
 };
 //转int类型
@@ -92,12 +65,36 @@ var getSendData = function (result, data) {
         message: result.message,
     };
 };
+//过滤 并干掉内部字段
+var filterQuery = function (query, filed) {
+    var res = query[filed];
+    if (res !== undefined) {
+        delete query[filed];
+        return res;
+    }
+    return null;
+};
+//增强isArr
+var isArr = function (anything) {
+    return Array.isArray(anything) && anything.length > 0;
+};
+//增强isObj
+var isObj = function (anything) {
+    return typeof anything === 'object' &&
+        !isArr(anything) &&
+        isArr(Object.keys(anything));
+};
 
 //返回值规范
 /* 成功状态码 */
 var SUCCESS = {
     code: 1,
     message: '成功',
+};
+/* 参数错误：10001-19999 */
+var PARAM_IS_INVALID = {
+    code: 10001,
+    message: '参数无效',
 };
 var PARAM_IS_BLANK = {
     code: 10002,
@@ -118,197 +115,197 @@ var INTERFACE_ADDRESS_INVALID = {
     message: '接口地址无效',
 };
 
-var router = new Router();
-var getRoutes = function (schema) {
-    //初始化 数据库 , 拿到schema 的keys数组
-    var _a = DB(schema), db = _a.db, keys = _a.keys;
-    //遍历数组 生成路由
-    keys.forEach(function (key) {
-        //get 查
-        router.get("/" + key, function (ctx, next) {
-            if (ctx.querystring !== '') {
-                /*  初始化阶段 */
-                var query = ctx.query;
-                var sortKey = ['id'];
-                var sortMehod = ['asc'];
-                if (query['id'] !== undefined) {
-                    //将id 转换为number类型
-                    query['id'] = _parseInt(query['id']);
-                }
-                if (query['_sort'] !== undefined) {
-                    //如果设置 sort 字段覆盖初始的 id
-                    sortKey[0] = query['_sort'].toString().toLowerCase();
-                    delete query['_sort'];
-                }
-                if (query['_order'] !== undefined) {
-                    //如果设置 order 字段覆盖初始的  asc
-                    sortKey[0] = query['_order'].toString().toLowerCase();
-                    console.log(sortKey);
-                    delete query['_order'];
-                }
-                //筛选操作符 get lte ,决定是否需要筛选
-                var res = matchOperators(query);
-                /*  分页查询 */
-                if (query['_limit'] !== undefined) {
-                    //转换成数字
-                    var page_1 = 1;
-                    if (query['_page'] !== undefined) {
-                        page_1 = _parseInt(query['_page']);
-                        delete query['_page'];
-                    }
-                    var limit_1 = _parseInt(query['_limit']);
-                    delete query['_limit'];
-                    //res为数组长度大于0 => 走 筛选 + 分页
-                    if (Array.isArray(res) && res.length > 0) {
-                        //解析操作符数组 , 获得好用得格式
-                        //将 name_gte=20 解析为 temp 形式
-                        var temp_1 = getOperators(res, query);
-                        //查询 slowdb
-                        var data_1 = db.get(key)
-                            .filter(function (el) {
-                            //分页 +  操作符 过滤
-                            if (el['id'] > (page_1 - 1) * limit_1) {
-                                return filterDependOnOperators(temp_1, el);
+//Singular
+//Paginate
+//Operators  _gte or _lte  or _ne  or  _like or _num
+//slice
+//sort _sort _order = asc or desc
+var parseSort = function (query) {
+    //解析url 中的 sort 关键字
+    var sortKey = (filterQuery(query, '_sort') || 'id').toString();
+    var orderKey = 'asc';
+    var temp = filterQuery(query, '_order');
+    if (temp === 'asc' || temp === 'desc') {
+        orderKey = temp;
+    }
+    return {
+        sortKey: sortKey,
+        orderKey: orderKey,
+    };
+};
+var parseOperators = function (query) {
+    var res = {};
+    var arr = matchOperators(query); //[name_lte,name_gte]
+    arr.forEach(function (str) {
+        // name_lte=10 => key=name , operators=lte , range=10
+        var splits = str.split('_');
+        var key = splits[0];
+        var operators = splits[1];
+        var range = query[str];
+        delete query[str];
+        if (!Array.isArray(res[key])) {
+            res[key] = [];
+        }
+        res[key].push({
+            range: range,
+            operators: operators,
+        });
+    });
+    return res;
+};
+var parseSlice = function (query) {
+    //解析slice 操作符 _start _end _limit
+    var start = filterQuery(query, '_start');
+    var end = filterQuery(query, '_end');
+    var limit = filterQuery(query, '_limit');
+    start = start === null ? -1 : _parseInt(start);
+    end = end === null ? -1 : _parseInt(end);
+    limit = limit === null ? 10 : _parseInt(limit);
+    return {
+        start: start,
+        end: end,
+        limit: limit,
+    };
+};
+var parsePaginate = function (query) {
+    var page = filterQuery(query, '_page');
+    page = page === null ? 1 : _parseInt(page);
+    return {
+        page: page,
+    };
+};
+
+var Get = (function (db, key, router) {
+    router.get("/" + key, function (ctx, next) {
+        var data = db.get(key).value();
+        //无参数 或者data 不是数组类型 直接发送数据 , -- 因为路由生成依靠与 data 所以 不需要判断data
+        if (ctx.querystring === '' || !isArr(data)) {
+            ctx.body = getSendData(SUCCESS, data);
+            return next();
+        }
+        var query = ctx.query;
+        //参数处理
+        var page = parsePaginate(query).page;
+        var _a = parseSort(query), sortKey = _a.sortKey, orderKey = _a.orderKey;
+        var _b = parseSlice(query), start = _b.start, end = _b.end, limit = _b.limit;
+        var operatorsObj = parseOperators(query);
+        //数据查询
+        //分析管道
+        // getAllbyReqUrl => queryConditon => Operators  => Slice => Paginate  => Sort
+        //queryConditon
+        if (isObj(query)) {
+            if (query['id']) {
+                query['id'] = _parseInt(query['id']);
+            }
+            data = _.filter(data, query);
+        }
+        //Operators 操作符管道
+        if (operatorsObj) {
+            var fileds_1 = Object.keys(operatorsObj);
+            if (isArr(fileds_1)) {
+                data = _.filter(data, function (dataItem) {
+                    return fileds_1.every(function (name) {
+                        return operatorsObj[name].every(function (_a) {
+                            var range = _a.range, operators = _a.operators;
+                            var compareData = _parseInt(dataItem[name]);
+                            range = _parseInt(range);
+                            var res = false;
+                            switch (operators) {
+                                case 'gte':
+                                    res = compareData > range;
+                                    break;
+                                case 'lte':
+                                    res = compareData < range;
+                                    break;
+                                case 'ne':
+                                    res = compareData !== range;
+                                    break;
+                                case 'like':
+                                    res = compareData.toString().includes(range.toString());
+                                    break;
+                                case 'num':
+                                    res = compareData === range;
                             }
-                            return false;
-                        })
-                            .orderBy(sortKey)
-                            .take(limit_1)
-                            .value();
-                        if (data_1) {
-                            ctx.body = getSendData(SUCCESS, data_1);
-                        }
-                        else {
-                            ctx.body = getSendData(RESULE_DATA_NONE, null);
-                        }
-                        // 停止逻辑 继续
-                        return;
-                    }
-                    //只有分页逻辑
-                    var data_2 = db.get(key)
-                        .filter(function (el) { return el['id'] > (page_1 - 1) * limit_1; })
-                        .orderBy(sortKey, sortMehod)
-                        .take(limit_1)
-                        .value();
-                    if (data_2) {
-                        ctx.body = getSendData(SUCCESS, data_2);
-                    }
-                    else {
-                        ctx.body = getSendData(RESULE_DATA_NONE, null);
-                    }
-                    return;
-                }
-                /*  含操作符条件查询,无分页  ---重复代码 待抽取 --- 考虑中*/
-                if (Array.isArray(res) && res.length > 0) {
-                    //解析操作符数组 , 获得好用得格式
-                    //将 name_gte=20 解析为 temp 形式
-                    var temp_2 = getOperators(res, query);
-                    //查询 slowdb
-                    var data_3 = db.get(key)
-                        .filter(function (el) { return filterDependOnOperators(temp_2, el); })
-                        .orderBy(sortKey, sortMehod)
-                        .value();
-                    if (data_3) {
-                        ctx.body = getSendData(SUCCESS, data_3);
-                    }
-                    else {
-                        ctx.body = getSendData(RESULE_DATA_NONE, null);
-                    }
-                    // 停止逻辑 继续
-                    return;
-                }
-                /*  无操作符条件查询
-        
-                 string !== number
-        
-                */
-                var data = db.get(key).find(query).value();
-                if (data) {
-                    //查询成功
-                    ctx.body = getSendData(SUCCESS, data);
-                }
-                else {
-                    //查询失败
-                    ctx.body = getSendData(RESULE_DATA_NONE, null);
-                }
+                            return res;
+                        });
+                    });
+                });
+            }
+        }
+        //slice   切割 管道
+        if (start !== -1 && end !== -1) {
+            data = _.slice(data, start, end);
+        }
+        //Paginate   分页管道
+        data = _.slice(data, (page - 1) * limit, page * limit);
+        //Sort   排序管道
+        data = _.orderBy(data, sortKey, orderKey);
+        // 发送
+        if (isArr(data)) {
+            ctx.body = getSendData(SUCCESS, data);
+        }
+        else {
+            ctx.body = getSendData(RESULE_DATA_NONE, null);
+        }
+        next();
+    });
+});
+
+var Post = (function (db, key, router) {
+    router.post("/" + key, function (ctx, next) {
+        //做添加处理
+        var condition = ctx.request.body;
+        if (condition && condition.id !== undefined) {
+            //如果有body
+            var res = db.get(key).find({ id: condition.id }).value();
+            if (res) {
+                //查询到结果 => 值已存在 返回存在的值
+                ctx.body = getSendData(DATA_ALREADY_EXISTED, res);
             }
             else {
-                //无参数 查询所有返回
-                ctx.body = getSendData(SUCCESS, db.get(key).value());
+                db.get(key).push(condition).write();
+                ctx.body = getSendData(SUCCESS, condition);
             }
-            next();
-        });
-        //delete  删
-        router.delete("/" + key, function (ctx, next) {
-            //做删除处理 并响应结果
-            var condition = ctx.request.body;
-            if (condition) {
-                //如果有body
-                var res = db.get(key).find(condition).value();
-                if (res) {
-                    db.get(key).remove(condition).write();
-                    ctx.body = {
-                        code: SUCCESS.code,
-                        message: SUCCESS.message + 'delete',
-                        data: res,
-                    };
-                }
-                else {
-                    //否则 查询数据失败
-                    ctx.body = {
-                        code: RESULE_DATA_NONE.code,
-                        message: RESULE_DATA_NONE.message,
-                        data: null,
-                    };
-                }
+        }
+        else {
+            //必须要求携带body  => 不然无法知道添加什么
+            ctx.body = getSendData(PARAM_IS_BLANK, null);
+        }
+        next();
+    });
+});
+
+var Delete = (function (db, key, router) {
+    //delete  删
+    router.delete("/" + key, function (ctx, next) {
+        //做删除处理 并响应结果
+        var condition = ctx.request.body;
+        if (condition) {
+            //如果有body
+            var res = db.get(key).find(condition).value();
+            if (res) {
+                db.get(key).remove(condition).write();
+                ctx.body = getSendData(SUCCESS, res);
             }
             else {
-                ctx.body = {
-                    code: PARAM_IS_BLANK.code,
-                    message: PARAM_IS_BLANK.message,
-                    data: null,
-                };
+                //否则 查询数据失败
+                ctx.body = getSendData(RESULE_DATA_NONE, null);
             }
-            next();
-        });
-        //post  增
-        router.post("/" + key, function (ctx, next) {
-            //做添加处理
-            var condition = ctx.request.body;
-            if (condition && condition.id !== undefined) {
-                //如果有body
-                var res = db.get(key).find({ id: condition.id }).value();
-                if (res) {
-                    //查询到结果 => 值已存在 返回存在的值
-                    ctx.body = {
-                        code: DATA_ALREADY_EXISTED.code,
-                        message: DATA_ALREADY_EXISTED.message,
-                        data: res,
-                    };
-                }
-                else {
-                    db.get(key).push(condition).write();
-                    ctx.body = {
-                        code: SUCCESS.code,
-                        message: SUCCESS.message + 'post',
-                        data: condition,
-                    };
-                }
-            }
-            else {
-                ctx.body = {
-                    code: PARAM_IS_BLANK.code,
-                    message: PARAM_IS_BLANK.message,
-                    data: null,
-                };
-            }
-            next();
-        });
-        //put  改
-        router.put("/" + key, function (ctx, next) {
-            //做update处理
-            var condition = ctx.request.body;
-            if (condition && condition.id !== undefined) {
+        }
+        else {
+            ctx.body = getSendData(PARAM_IS_BLANK, null);
+        }
+        next();
+    });
+});
+
+var Put = (function (db, key, router) {
+    //put  改
+    router.put("/" + key, function (ctx, next) {
+        //做update处理
+        var condition = ctx.request.body;
+        if (condition) {
+            if (condition.id !== undefined) {
                 //如果有body 并且有id
                 var res = db.get(key).find({ id: condition.id }).value();
                 if (res) {
@@ -316,30 +313,38 @@ var getRoutes = function (schema) {
                         .find({ id: condition.id })
                         .assign(condition)
                         .write();
-                    ctx.body = {
-                        code: SUCCESS.code,
-                        message: SUCCESS.message + 'put',
-                        data: null,
-                    };
+                    ctx.body = getSendData(SUCCESS, null);
                 }
                 else {
                     //数据未找到 无法修改
-                    ctx.body = {
-                        code: RESULE_DATA_NONE.code,
-                        message: RESULE_DATA_NONE.message,
-                        data: null,
-                    };
+                    ctx.body = getSendData(RESULE_DATA_NONE, null);
                 }
             }
             else {
-                ctx.body = {
-                    code: PARAM_IS_BLANK.code,
-                    message: PARAM_IS_BLANK.message,
-                    data: null,
-                };
+                ctx.body = getSendData(PARAM_IS_INVALID, null);
             }
-            next();
-        });
+        }
+        else {
+            ctx.body = getSendData(PARAM_IS_BLANK, null);
+        }
+        next();
+    });
+});
+
+var router = new Router();
+var getRoutes = function (schema) {
+    //初始化 数据库 , 拿到schema 的keys数组
+    var _a = DB(schema), db = _a.db, keys = _a.keys;
+    //遍历数组 生成路由
+    keys.forEach(function (key) {
+        //增
+        Post(db, key, router);
+        //删
+        Delete(db, key, router);
+        //改
+        Put(db, key, router);
+        //查
+        Get(db, key, router);
     });
     return router.routes();
 };
@@ -353,7 +358,7 @@ app.use(function (ctx, next) {
     }
     ctx.set({
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'X-Token,Content-Type',
+        'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE',
         'Access-Control-Allow-Credentials': 'true',
     });
