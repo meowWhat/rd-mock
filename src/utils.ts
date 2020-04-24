@@ -10,27 +10,6 @@ export const matchOperators = (query: query) => {
   )
 }
 
-//解析匹配到的  数组 返回一个对象
-export const getOperators = (arr: Array<string>, query: query) => {
-  let temp: {
-    [key: string]: Array<{ operators: string; range: number }>
-  } = {}
-  arr.forEach((key) => {
-    let splits = key.split('_')
-    let name = splits[0]
-    let operators = splits[1]
-    if (!Array.isArray(temp[name])) {
-      temp[name] = []
-    }
-    let range = _parseInt(query[key])
-    temp[name].push({
-      range,
-      operators,
-    })
-  })
-  return temp
-}
-
 //转int类型
 export const _parseInt = (anything: string | number): number => {
   if (typeof anything === 'string') {
