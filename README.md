@@ -120,6 +120,10 @@ fetch(`${url}`, {
 }
 ```
 
+## Schema
+
+- Refer to [mockjs](http://mockjs.com/examples.html) for more demonstrations about Schema
+
 ## Router Rule
 
 ### Singular routes
