@@ -198,18 +198,58 @@ GET /posts?title_like=xxx
 
 - Works exactly as String.includes
 
+### Warning
+
+- Same field Only one operator will be matched
+
+```
+// wrong
+ get('/user?id_ne=1&id_ne=2&id_ne=3'))
+// only  id_ne =3   will work
+
+// right
+get('/user?id_ne=8&id_gte=5')
+
+```
+
+- the \_limit=10 is default when you used operator pipe
+
+```
+// schema
+'user|20': [
+    {
+      'id|+1': 1,
+    },
+  ],
+
+// test
+ expect((await axios.get('/user?id_gte=0')).data.data.length).toBe(10)
+
+
+// but you can set the _limit to change the defalut _limit
+
+// test
+ expect((await axios.get('/user?id_gte=0&_limit=20')).data.data.length).toBe(20)
+```
+
 ## Router Pipe
 
 ```
-getAllbyReqUrl
+getAllDataByReqUrl  => data
 
-// if  Array.isArray(data) && data.length > 0
+ if  (Array.isArray(data) && data.length > 0) {
 
 => queryConditon => Operators  => Slice => Paginate  => Sort
 
-// else  return data
+
+} else {
+
+ return data
+
+}
+
 ```
 
 ## 👀 License
 
-这个项目 MIT 协议， 请点击 [LICENSE.md](LICENSE.md) 了解更多细节。
+MIT [LICENSE.md](LICENSE.md)

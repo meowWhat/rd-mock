@@ -57,5 +57,6 @@ describe('utils test', () => {
     expect(isObj({})).toBe(false)
     expect(isObj({ id: 0 })).toBe(true)
     expect(isObj([])).toBe(false)
+    expect(isObj({ name: 'www' })).toBe(true)
   })
 })

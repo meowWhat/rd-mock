@@ -59,7 +59,7 @@ export default (db: dbType, key: string, router: router) => {
                   res = compareData < range
                   break
                 case 'ne':
-                  res = compareData !== range
+                  res =( compareData !== range)
                   break
                 case 'like':
                   res = compareData.toString().includes(range.toString())
