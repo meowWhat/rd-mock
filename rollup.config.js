@@ -4,7 +4,7 @@ export default {
   input: `src/index.ts`,
   output: [
     {
-      file: 'index.js',
+      file: 'lib/index.js',
       format: 'cjs',
     },
   ],
