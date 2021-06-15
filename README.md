@@ -32,9 +32,9 @@ const schema = {
     },
   ],
 }
-
+const delay = 500
 // Start  rd-mock  on port 3000
-rdMock(schema, 3000)
+rdMock(schema, 3000, delay)
 ```
 
 - use simple router
@@ -238,47 +238,54 @@ get('/user?id_ne=8&id_gte=5')
 
 ## Result
 
-- only GET request will fetch the Data, and the rest of the requests have only a status code and status message
+- only GET request will fetch the Data, and the rest of the requests have only a status code and status msg
 
 ```javascript
-/* 成功状态码 */
 export const SUCCESS = {
-  code: 1,
-  message: '成功',
+  rtn: 0,
+  msg: '成功',
+  data: null,
 }
 
 /* 参数错误：10001-19999 */
 export const PARAM_IS_INVALID = {
-  code: 10001,
-  message: '参数无效',
+  rtn: 10001,
+  msg: '参数无效',
+  data: 'any',
 }
 export const PARAM_IS_BLANK = {
   code: 10002,
-  message: '参数为空',
+  msg: '参数为空',
+  data: 'any',
 }
 
 /* 系统错误：40001-49999 */
 export const SYSTEM_INNER_ERROR = {
-  code: 40001,
-  message: '系统繁忙，请稍后重试',
+  rtn: 40001,
+  msg: '系统繁忙，请稍后重试',
+  data: 'any',
 }
 /* 数据错误：50001-599999 */
 export const RESULE_DATA_NONE = {
-  code: 50001,
-  message: '数据未找到',
+  rtn: 50001,
+  msg: '数据未找到',
+  data: 'any',
 }
 export const DATA_IS_WRONG = {
-  code: 50002,
-  message: '数据有误',
+  rtn: 50002,
+  msg: '数据有误',
+  data: 'any',
 }
 export const DATA_ALREADY_EXISTED = {
-  code: 50003,
-  message: '数据已存在',
+  rtn: 50003,
+  msg: '数据已存在',
+  data: 'any',
 }
 /* 接口错误：60001-69999 */
 export const INTERFACE_ADDRESS_INVALID = {
-  code: 60004,
-  message: '接口地址无效',
+  rtn: 60004,
+  msg: '接口地址无效',
+  data: 'any',
 }
 ```
 

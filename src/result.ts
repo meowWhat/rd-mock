@@ -2,7 +2,7 @@
 
 /* 成功状态码 */
 export const SUCCESS = {
-  code: 1,
+  code: 0,
   message: '成功',
 }
 

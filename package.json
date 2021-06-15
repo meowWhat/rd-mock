@@ -1,6 +1,6 @@
 {
   "name": "rd-mock",
-  "version": "1.6.1",
+  "version": "2.0.0",
   "main": "./lib/index.js",
   "types": "./dist/types/index.d.ts",
   "license": "MIT",

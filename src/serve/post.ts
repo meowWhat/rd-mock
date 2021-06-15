@@ -11,7 +11,8 @@ export default (db: dbType, key: string, router: router) => {
   router.post(`/${key}`, (ctx, next) => {
     //做添加处理
     let condition = ctx.request.body
-    if (isObj(condition) && condition.id !== undefined) {
+    condition.id = condition.id || Date.now()
+    if (isObj(condition)) {
       let data = db.get(key).value()
       if (isObj(data)) {
         const flag = Object.keys(condition).every(

@@ -5,9 +5,9 @@ export declare const getSendData: (result: {
     code: number;
     message: string;
 }, data: any) => {
-    code: number;
+    rtn: number;
     data: any;
-    message: string;
+    msg: string;
 };
 export declare const filterQuery: (query: query, filed: "_start" | "_end" | "_limit" | "_sort" | "_order" | "_page" | "_num") => string | number | null;
 export declare const isArr: (anything: any) => boolean;

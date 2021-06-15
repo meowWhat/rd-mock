@@ -27,9 +27,9 @@ export const getSendData = (
   data: any
 ) => {
   return {
-    code: result.code,
+    rtn: result.code,
     data: data,
-    message: result.message,
+    msg: result.message,
   }
 }
 

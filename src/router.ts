@@ -9,6 +9,21 @@ export const getRoutes = (schema: schema) => {
   //初始化 数据库 , 拿到schema 的keys数组
   const { db, keys } = DB(schema)
 
+  router.get('/', (ctx, next) => {
+    ctx.body = `
+      <h1>Rd-Mock</h1>
+      <h3>路由列表:</h3>
+      <ul>
+      ${keys
+        .map((item) => {
+          return `<li>/${item}</li>`
+        })
+        .join('')}
+      </ul>`
+    ctx.set({ 'Content-Type': 'text/html;charset=utf-8' })
+    next()
+  })
+
   //遍历数组 生成路由
   keys.forEach((key) => {
     //增

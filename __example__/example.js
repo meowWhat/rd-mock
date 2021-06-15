@@ -1,4 +1,4 @@
-const { rdMock } = require('../index')
+const { rdMock } = require('../lib/index')
 
 //use `mockjs` schema  to create rd-mock data
 //rd-mock require filed 'id' in schema
@@ -13,6 +13,5 @@ const schema = {
     },
   ],
 }
-
 // Start  rd-mock  on port 3000
-rdMock(schema, 3000)
+rdMock(schema, 3000, 2000)
