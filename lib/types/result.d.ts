@@ -14,7 +14,7 @@ export declare const SYSTEM_INNER_ERROR: {
     code: number;
     message: string;
 };
-export declare const RESULE_DATA_NONE: {
+export declare const RESULT_DATA_NONE: {
     code: number;
     message: string;
 };

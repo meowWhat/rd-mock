@@ -1,6 +1,6 @@
 import { dbType, router } from '../types'
 import { getSendData, isObj, isArr } from '../utils'
-import { SUCCESS, RESULE_DATA_NONE, PARAM_IS_BLANK } from '../result'
+import { SUCCESS, RESULT_DATA_NONE, PARAM_IS_BLANK } from '../result'
 
 export default (db: dbType, key: string, router: router) => {
   //delete  删
@@ -17,7 +17,7 @@ export default (db: dbType, key: string, router: router) => {
           db.unset(key).write()
           ctx.body = getSendData(SUCCESS, null)
         } else {
-          ctx.body = getSendData(RESULE_DATA_NONE, null)
+          ctx.body = getSendData(RESULT_DATA_NONE, null)
         }
       } else if (isArr(data)) {
         let res = (db.get(key) as any).find(condition).value()
@@ -27,10 +27,10 @@ export default (db: dbType, key: string, router: router) => {
           ctx.body = getSendData(SUCCESS, null)
         } else {
           //否则 查询数据失败
-          ctx.body = getSendData(RESULE_DATA_NONE, null)
+          ctx.body = getSendData(RESULT_DATA_NONE, null)
         }
       } else {
-        ctx.body = getSendData(RESULE_DATA_NONE, null)
+        ctx.body = getSendData(RESULT_DATA_NONE, null)
       }
     } else {
       ctx.body = getSendData(PARAM_IS_BLANK, null)

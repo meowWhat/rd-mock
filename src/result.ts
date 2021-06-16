@@ -22,7 +22,7 @@ export const SYSTEM_INNER_ERROR = {
   message: '系统繁忙，请稍后重试',
 }
 /* 数据错误：50001-599999 */
-export const RESULE_DATA_NONE = {
+export const RESULT_DATA_NONE = {
   code: 50001,
   message: '数据未找到',
 }

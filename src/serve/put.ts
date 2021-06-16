@@ -1,7 +1,7 @@
 import { dbType, router } from '../types'
 import { getSendData, isArr, isObj } from '../utils'
 
-import { SUCCESS, RESULE_DATA_NONE, PARAM_IS_INVALID } from '../result'
+import { SUCCESS, RESULT_DATA_NONE, PARAM_IS_INVALID } from '../result'
 
 export default (db: dbType, key: string, router: router) => {
   //put  改
@@ -18,7 +18,7 @@ export default (db: dbType, key: string, router: router) => {
         //查询
         const tempData = (db.get(key) as any).find({ id: condition.id }).value()
         if (!isObj(tempData)) {
-          ctx.body = getSendData(RESULE_DATA_NONE, null)
+          ctx.body = getSendData(RESULT_DATA_NONE, null)
         } else {
           ;(db.get(key) as any)
             .find({ id: condition.id })
@@ -27,7 +27,7 @@ export default (db: dbType, key: string, router: router) => {
           ctx.body = getSendData(SUCCESS, null)
         }
       } else {
-        ctx.body = getSendData(RESULE_DATA_NONE, null)
+        ctx.body = getSendData(RESULT_DATA_NONE, null)
       }
     } else {
       ctx.body = getSendData(PARAM_IS_INVALID, null)

@@ -43,8 +43,8 @@ describe('utils test', () => {
   })
   test('getSendData', () => {
     expect(getSendData(SUCCESS, 1)).toEqual({
-      code: 1,
-      message: '成功',
+      rtn: 0,
+      msg: '成功',
       data: 1,
     })
   })

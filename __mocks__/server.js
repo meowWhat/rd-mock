@@ -1,5 +1,5 @@
 //test
-const { rdMock } = require('../index')
+const { rdMock } = require('../lib/index')
 
 const schema = {
   'a|5': [
@@ -55,4 +55,4 @@ const schema = {
 }
 
 // Start  rd-mock  on port 3000
-rdMock(schema, 4666)
+rdMock(schema, { port: 4666 })

@@ -7,30 +7,30 @@ describe('CURD  TEST', () => {
       method: 'DELETE',
       data: { id: 1 },
     })
-    expect(res.data.code).toBe(1)
+    expect(res.data.rtn).toBe(0)
     const res2 = await axios({
       url: '/a',
       method: 'DELETE',
       data: { id: 15 },
     })
-    expect(res2.data.code).toBe(50001)
+    expect(res2.data.rtn).toBe(50001)
     const res3 = await axios({
       url: '/a',
       method: 'DELETE',
     })
-    expect(res3.data.code).toBe(10002)
+    expect(res3.data.rtn).toBe(10002)
     const res4 = await axios({
       url: '/e',
       method: 'DELETE',
       data: { id: 5 },
     })
-    expect(res4.data.code).toBe(50001)
+    expect(res4.data.rtn).toBe(50001)
     const res5 = await axios({
       url: '/e',
       method: 'DELETE',
       data: { id: 2 },
     })
-    expect(res5.data.code).toBe(1)
+    expect(res5.data.rtn).toBe(0)
   })
   test('post  test', async () => {
     const res1 = await axios({
@@ -38,26 +38,26 @@ describe('CURD  TEST', () => {
       method: 'POST',
       data: { id: 3 },
     })
-    expect(res1.data.code).toBe(1)
+    expect(res1.data.rtn).toBe(0)
 
     const res2 = await axios({
       url: '/b',
       method: 'POST',
       data: { id: 1 },
     })
-    expect(res2.data.code).toBe(50003)
+    expect(res2.data.rtn).toBe(50003)
     const res3 = await axios({
       url: '/b',
       method: 'POST',
     })
-    expect(res3.data.code).toBe(10001)
+    expect(res3.data.rtn).toBe(0)
 
     const res4 = await axios({
       url: '/c',
       method: 'POST',
       data: { id: 2, name: 'post' },
     })
-    expect(res4.data.code).toBe(1)
+    expect(res4.data.rtn).toBe(0)
   })
   test('put test', async () => {
     const res1 = await axios({
@@ -65,21 +65,21 @@ describe('CURD  TEST', () => {
       method: 'PUT',
       data: { id: 3, name: 'dddd' },
     })
-    expect(res1.data.code).toBe(1)
+    expect(res1.data.rtn).toBe(0)
 
     const res2 = await axios({
       url: '/d',
       method: 'PUT',
       data: { id: 3 },
     })
-    expect(res2.data.code).toBe(50001)
+    expect(res2.data.rtn).toBe(50001)
 
     const res3 = await axios({
       url: '/d',
       method: 'PUT',
       data: { id: 2, name: 'ddd', message: 'oooo' },
     })
-    expect(res3.data.code).toBe(1)
+    expect(res3.data.rtn).toBe(0)
   })
   test('get test', async () => {
     expect((await axios.get('/user')).data.data.length).toBe(12)

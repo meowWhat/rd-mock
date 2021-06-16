@@ -4,7 +4,7 @@ import {
   SUCCESS,
   DATA_ALREADY_EXISTED,
   PARAM_IS_INVALID,
-  RESULE_DATA_NONE,
+  RESULT_DATA_NONE,
 } from '../result'
 
 export default (db: dbType, key: string, router: router) => {
@@ -37,7 +37,7 @@ export default (db: dbType, key: string, router: router) => {
           ctx.body = getSendData(SUCCESS, null)
         }
       } else {
-        ctx.body = getSendData(RESULE_DATA_NONE, null)
+        ctx.body = getSendData(RESULT_DATA_NONE, null)
       }
     } else {
       ctx.body = getSendData(PARAM_IS_INVALID, null)

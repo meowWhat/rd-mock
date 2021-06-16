@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { dbType, router } from '../types'
 import { getSendData, _parseInt, isArr, isObj } from '../utils'
-import { SUCCESS, RESULE_DATA_NONE } from '../result'
+import { SUCCESS, RESULT_DATA_NONE } from '../result'
 import {
   parsePaginate,
   parseSort,
@@ -13,7 +13,7 @@ export default (db: dbType, key: string, router: router) => {
   router.get(`/${key}`, (ctx, next) => {
     let data: string[] = db.get(key).value()
 
-    //无参数 或者data 不是数组类型 直接发送数据 , -- 因为路由生成依靠与 data 所以 不需要判断data
+    // 无参数或者 data 不是数组类型直接发送数据
     if (ctx.querystring === '' || !isArr(data)) {
       ctx.body = getSendData(SUCCESS, data)
       return next()
@@ -21,18 +21,18 @@ export default (db: dbType, key: string, router: router) => {
 
     let query = ctx.query
 
-    //参数处理
+    // 参数处理
     const { page } = parsePaginate(query)
     const { sortKey, orderKey } = parseSort(query)
     const { start, end, limit } = parseSlice(query)
     const operatorsObj = parseOperators(query)
 
-    //数据查询
+    // 数据查询
 
-    //分析管道
-    // getAllbyReqUrl => queryConditon => Operators  => Slice => Paginate  => Sort
+    // 分析管道
+    // getAllByReqUrl => queryCondition => Operators  => Slice => Paginate  => Sort
 
-    //queryConditon
+    // queryCondition
 
     if (isObj(query)) {
       if (query['id']) {
@@ -41,31 +41,33 @@ export default (db: dbType, key: string, router: router) => {
       data = _.filter(data, query)
     }
 
-    //Operators 操作符管道
+    // Operators 操作符管道
     if (operatorsObj) {
-      let fileds = Object.keys(operatorsObj)
-      if (isArr(fileds)) {
+      let fields = Object.keys(operatorsObj)
+      if (isArr(fields)) {
         data = _.filter(data, (dataItem) =>
-          fileds.every((name: any) =>
+          fields.every((name: any) =>
             operatorsObj[name].every(({ range, operators }) => {
-              const compareData = _parseInt(dataItem[name])
-              range = _parseInt(range)
+              const compareDataInt = _parseInt(dataItem[name])
+              const compareDataString = dataItem[name].toString()
+              const rangeInt = _parseInt(range)
+              const rangeString = range.toString()
               let res = false
               switch (operators) {
                 case 'gte':
-                  res = compareData > range
+                  res = compareDataInt > rangeInt
                   break
                 case 'lte':
-                  res = compareData < range
+                  res = compareDataInt < rangeInt
                   break
                 case 'ne':
-                  res =( compareData !== range)
+                  res = compareDataInt !== rangeInt
                   break
                 case 'like':
-                  res = compareData.toString().includes(range.toString())
+                  res = compareDataString.includes(rangeString)
                   break
                 case 'num':
-                  res = compareData === range
+                  res = compareDataInt === rangeInt
               }
               return res
             })
@@ -74,23 +76,22 @@ export default (db: dbType, key: string, router: router) => {
       }
     }
 
-    //slice   切割 管道
+    // slice   切割 管道
     if (start !== -1 && end !== -1) {
       data = _.slice(data, start, end)
     }
 
-    //Paginate   分页管道
-
+    // Paginate   分页管道
     data = _.slice(data, (page - 1) * limit, page * limit)
 
-    //Sort   排序管道
+    // Sort   排序管道
     data = _.orderBy(data, sortKey, orderKey)
 
     // 发送
     if (isArr(data)) {
       ctx.body = getSendData(SUCCESS, data)
     } else {
-      ctx.body = getSendData(RESULE_DATA_NONE, null)
+      ctx.body = getSendData(RESULT_DATA_NONE, null)
     }
 
     next()
