@@ -1,8 +1,8 @@
 {
   "name": "rd-mock",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "main": "./lib/index.js",
-  "types": "./dist/types/index.d.ts",
+  "types": "./lib/types/index.d.ts",
   "license": "MIT",
   "description": "Get a full fake REST API And MockData with zero coding in less than 30 seconds,inspired by json-serve && mockjs",
   "keywords": [
