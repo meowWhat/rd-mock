@@ -14,13 +14,13 @@ yarn add rd-mock --dev # or：npm install rd-mock --dev
 
 ### 🔨 Usage example
 
-- use rd-mock to start server
+- create schema && start server
 
 ```javascript
-const { rdMock } = require('../lib/index')
+const { rdMock } = require('rd-mock')
 
-// use `mockjs` schema  to create rd-mock data
-// rd-mock require filed 'id' in schema
+// use `mockjs` schema to create mock data
+// field 'id' is required in any schema
 const schema = {
   'a|5': [
     {
@@ -33,7 +33,7 @@ const schema = {
   ],
 }
 
-// Start  rd-mock  on port 3000
+// start mock server
 rdMock(schema, {
   port: 3000,
   delay: 0,
@@ -41,6 +41,7 @@ rdMock(schema, {
     async (ctx, next) => {
       if (ctx.request.method === 'GET' && ctx.request.url === 'a') {
         const { data } = ctx.body
+        // custom response result
         ctx.body.data = {
           count: 400,
           list: data,
@@ -51,6 +52,7 @@ rdMock(schema, {
   ],
   requestInterceptors: [
     async (ctx, next) => {
+      // custom request params
       const query = ctx.query
       if (query['page']) {
         query['_page'] = query['page']
@@ -158,10 +160,10 @@ fetch(`${url}`, {
 ### Singular routes
 
 ```
-GET    /profile
-POST   /profile
-PUT    /profile
-PATCH  /profile
+GET    /profile # get data
+POST   /profile # create data
+PUT    /profile # update data by id
+DELETE  /profile # remove data by id
 ```
 
 ### Filter
