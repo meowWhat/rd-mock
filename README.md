@@ -72,6 +72,9 @@ rdMock(schema, {
 
 ```javascript
 const url = 'http://localhost:3000/a'
+const headers = {
+  'Content-Type': 'application/json;charset=utf-8',
+}
 fetch(`${url}`, {
   //get data
   method: 'GET',
@@ -83,9 +86,7 @@ fetch(`${url}`, {
       //create data
       method: 'POST',
       body: JSON.stringify({ id: 6, name: 'create data' }),
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
+      headers,
     })
   })
   .then(() => {
@@ -93,9 +94,7 @@ fetch(`${url}`, {
       // update data
       method: 'PUT',
       body: JSON.stringify({ id: 5, name: 'update date' }),
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
+      headers,
     })
   })
   .then(() => {
@@ -103,9 +102,7 @@ fetch(`${url}`, {
       // delete data
       method: 'DELETE',
       body: JSON.stringify({ id: 1 }),
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
+      headers,
     })
   })
 ```
