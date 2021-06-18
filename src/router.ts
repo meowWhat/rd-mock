@@ -2,7 +2,7 @@ import Router from 'koa-router'
 import { schema } from './types'
 import DB from './db/initDB'
 import { Get, Put, Delete, Post } from './serve'
-
+import { indexHtmlTemplate } from './template/indexHtml'
 const router = new Router()
 
 export const getRoutes = (schema: schema) => {
@@ -10,16 +10,15 @@ export const getRoutes = (schema: schema) => {
   const { db, keys } = DB(schema)
 
   router.get('/', (ctx, next) => {
-    ctx.body = `
-      <h1>Rd-Mock</h1>
-      <h3>路由列表:</h3>
-      <ul>
-      ${keys
-        .map((item) => {
-          return `<li>/${item}</li>`
-        })
-        .join('')}
-      </ul>`
+    const resource = `<ul>
+    ${keys
+      .map((item) => {
+        return `<li><a href="/${item}">/${item}</a></li>\n`
+      })
+      .join('')}
+    </ul>`
+
+    ctx.body = indexHtmlTemplate.replace('#resources#', resource)
     ctx.set({ 'Content-Type': 'text/html;charset=utf-8' })
     next()
   })
