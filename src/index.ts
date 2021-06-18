@@ -3,7 +3,8 @@ import bodyParser from 'koa-bodyparser'
 import { getRoutes } from './router'
 import { schema } from './types'
 import { INTERFACE_ADDRESS_INVALID } from './result'
-
+import 'colors'
+import os from 'os'
 const app = new Koa()
 
 app.use(bodyParser())
@@ -74,7 +75,7 @@ const rdMock = (schema: schema, config: ConfigOptions) => {
   // 生成路由
   app.use(getRoutes(schema))
 
-  // 生成响应拦截器
+  // 应用响应拦截器
   if (responseInterceptors) {
     responseInterceptors.forEach((middleWare) => {
       app.use(middleWare)
@@ -82,7 +83,24 @@ const rdMock = (schema: schema, config: ConfigOptions) => {
   }
 
   app.listen(port, () => {
-    console.log(`服务器成功启动于:http://localhost:${port}/`)
+    const ipList: string[] = []
+    const ifaces = os.networkInterfaces()
+    Object.keys(ifaces).forEach(function (ifname) {
+      ifaces[ifname]?.forEach(function (iface) {
+        if ('IPv4' !== iface.family || iface.internal !== false) {
+          // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
+          return
+        }
+        ipList.push(iface.address)
+      })
+    })
+    console.log(
+      ` DONE `.bgGreen.black + ' ' + 'Compiled successfully'.green,
+      '\n'
+    )
+    console.log('  rd-mock running at:')
+    console.log('  - LOCAL: ' + `http://localhost:${port}/`.cyan)
+    console.log('  - NetWork: ' + `http://${ipList[0]}:${port}/`.cyan)
   })
 }
 

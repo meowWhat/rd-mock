@@ -19,6 +19,7 @@
   "dependencies": {
     "@types/lowdb": "^1.0.9",
     "@types/mockjs": "^1.0.2",
+    "colors": "^1.4.0",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^8.0.8",
